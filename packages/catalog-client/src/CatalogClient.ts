@@ -24,7 +24,7 @@ import {
   stringifyLocationReference,
 } from '@backstage/catalog-model';
 import { ResponseError } from '@backstage/errors';
-import fetch from 'cross-fetch';
+import crossFetch from 'cross-fetch';
 import {
   CATALOG_FILTER_EXISTS,
   AddLocationRequest,
@@ -39,9 +39,14 @@ import { DiscoveryApi } from './types/discovery';
 /** @public */
 export class CatalogClient implements CatalogApi {
   private readonly discoveryApi: DiscoveryApi;
+  private readonly fetch: typeof crossFetch;
 
-  constructor(options: { discoveryApi: DiscoveryApi }) {
+  constructor(options: {
+    discoveryApi: DiscoveryApi;
+    fetch?: typeof crossFetch;
+  }) {
     this.discoveryApi = options.discoveryApi;
+    this.fetch = options.fetch || crossFetch;
   }
 
   async getLocationById(
@@ -140,7 +145,7 @@ export class CatalogClient implements CatalogApi {
     { type = 'url', target, dryRun, presence }: AddLocationRequest,
     options?: CatalogRequestOptions,
   ): Promise<AddLocationResponse> {
-    const response = await fetch(
+    const response = await this.fetch(
       `${await this.discoveryApi.getBaseUrl('catalog')}/locations${
         dryRun ? '?dryRun=true' : ''
       }`,
@@ -242,7 +247,7 @@ export class CatalogClient implements CatalogApi {
     const headers: Record<string, string> = options?.token
       ? { Authorization: `Bearer ${options.token}` }
       : {};
-    const response = await fetch(url, { method, headers });
+    const response = await this.fetch(url, { method, headers });
 
     if (!response.ok) {
       throw await ResponseError.fromResponse(response);
@@ -258,7 +263,7 @@ export class CatalogClient implements CatalogApi {
     const headers: Record<string, string> = options?.token
       ? { Authorization: `Bearer ${options.token}` }
       : {};
-    const response = await fetch(url, { method, headers });
+    const response = await this.fetch(url, { method, headers });
 
     if (!response.ok) {
       throw await ResponseError.fromResponse(response);
@@ -276,7 +281,7 @@ export class CatalogClient implements CatalogApi {
     const headers: Record<string, string> = options?.token
       ? { Authorization: `Bearer ${options.token}` }
       : {};
-    const response = await fetch(url, { method, headers });
+    const response = await this.fetch(url, { method, headers });
 
     if (!response.ok) {
       if (response.status === 404) {
