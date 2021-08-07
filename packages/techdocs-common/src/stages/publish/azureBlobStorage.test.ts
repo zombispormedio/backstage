@@ -279,13 +279,14 @@ describe('publishing with valid credentials', () => {
       mockFs({
         [entityRootDir]: {
           'techdocs_metadata.json':
-            '{"site_name": "backstage", "site_description": "site_content", "etag": "etag"}',
+            '{"site_name": "backstage", "site_description": "site_content", "etag": "etag", "build_timestamp": 612741599}',
         },
       });
       const expectedMetadata: TechDocsMetadata = {
         site_name: 'backstage',
         site_description: 'site_content',
         etag: 'etag',
+        build_timestamp: 612741599,
       };
       expect(
         await publisher.fetchTechDocsMetadata(entityNameMock),
@@ -300,7 +301,7 @@ describe('publishing with valid credentials', () => {
 
       mockFs({
         [entityRootDir]: {
-          'techdocs_metadata.json': `{'site_name': 'backstage', 'site_description': 'site_content', 'etag': 'etag'}`,
+          'techdocs_metadata.json': `{'site_name': 'backstage', 'site_description': 'site_content', 'etag': 'etag', 'build_timestamp': 612741599}`,
         },
       });
 
@@ -308,6 +309,7 @@ describe('publishing with valid credentials', () => {
         site_name: 'backstage',
         site_description: 'site_content',
         etag: 'etag',
+        build_timestamp: 612741599,
       };
       expect(
         await publisher.fetchTechDocsMetadata(entityNameMock),

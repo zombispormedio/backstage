@@ -233,7 +233,7 @@ describe('OpenStackSwiftPublish', () => {
       mockFs({
         [entityRootDir]: {
           'techdocs_metadata.json':
-            '{"site_name": "backstage", "site_description": "site_content", "etag": "etag"}',
+            '{"site_name": "backstage", "site_description": "site_content", "etag": "etag", "build_timestamp": 612741599}',
         },
       });
 
@@ -241,6 +241,7 @@ describe('OpenStackSwiftPublish', () => {
         site_name: 'backstage',
         site_description: 'site_content',
         etag: 'etag',
+        build_timestamp: 612741599,
       };
       expect(
         await publisher.fetchTechDocsMetadata(entityNameMock),
@@ -255,7 +256,7 @@ describe('OpenStackSwiftPublish', () => {
 
       mockFs({
         [entityRootDir]: {
-          'techdocs_metadata.json': `{'site_name': 'backstage', 'site_description': 'site_content', 'etag': 'etag'}`,
+          'techdocs_metadata.json': `{'site_name': 'backstage', 'site_description': 'site_content', 'etag': 'etag', 'build_timestamp': 612741599}`,
         },
       });
 
@@ -263,6 +264,7 @@ describe('OpenStackSwiftPublish', () => {
         site_name: 'backstage',
         site_description: 'site_content',
         etag: 'etag',
+        build_timestamp: 612741599,
       };
       expect(
         await publisher.fetchTechDocsMetadata(entityNameMock),
