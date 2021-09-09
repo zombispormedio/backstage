@@ -23,11 +23,9 @@ import {
   ScmIntegrations,
 } from '@backstage/integration';
 import fetch from 'cross-fetch';
-import parseGitUrl from 'git-url-parse';
 import { Minimatch } from 'minimatch';
 import { Readable } from 'stream';
 import { NotFoundError, NotModifiedError } from '@backstage/errors';
-import { stripFirstDirectoryFromPath } from './tree/util';
 import {
   ReadTreeResponseFactory,
   ReaderFactory,
@@ -39,6 +37,19 @@ import {
   ReadUrlOptions,
   ReadUrlResponse,
 } from './types';
+
+// Azure puts the path in the `path` param and `git-url-parse` doesn't handle
+// on-prem azure deployments too well, so do this manually instead.
+function getAzureUrlFilepath(url: string) {
+  const path = new URL(url).searchParams.get('path');
+  if (!path) {
+    return undefined;
+  }
+  if (path.startsWith('/')) {
+    return path.slice(1);
+  }
+  return path;
+}
 
 /** @public */
 export class AzureUrlReader implements UrlReader {
@@ -127,19 +138,17 @@ export class AzureUrlReader implements UrlReader {
       throw new Error(message);
     }
 
-    const { filepath } = parseGitUrl(url);
-
     return await this.deps.treeResponseFactory.fromZipArchive({
       stream: archiveAzureResponse.body as unknown as Readable,
       etag: commitSha,
       filter: options?.filter,
-      subpath: filepath,
+      subpath: getAzureUrlFilepath(url),
     });
   }
 
   async search(url: string, options?: SearchOptions): Promise<SearchResponse> {
-    const { filepath } = parseGitUrl(url);
-    const matcher = new Minimatch(filepath);
+    const filepath = getAzureUrlFilepath(url);
+    const matcher = filepath && new Minimatch(filepath);
 
     // TODO(freben): For now, read the entire repo and filter through that. In
     // a future improvement, we could be smart and try to deduce that non-glob
@@ -151,7 +160,7 @@ export class AzureUrlReader implements UrlReader {
 
     const tree = await this.readTree(treeUrl.toString(), {
       etag: options?.etag,
-      filter: path => matcher.match(stripFirstDirectoryFromPath(path)),
+      filter: path => (matcher ? matcher.match(path) : true),
     });
     const files = await tree.files();
 
