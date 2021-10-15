@@ -21,6 +21,7 @@ import { RouteRef, useRouteRef } from '../routing';
 import { attachComponentData } from './componentData';
 import { Extension, BackstagePlugin } from '../plugin/types';
 import { PluginErrorBoundary } from './PluginErrorBoundary';
+import { PluginProvider } from './PluginProvider';
 
 type ComponentLoader<T> =
   | {
@@ -140,19 +141,25 @@ export function createReactExtension<
           | undefined;
 
         return (
-          <Suspense fallback={<Progress />}>
-            <PluginErrorBoundary app={app} plugin={plugin}>
-              <AnalyticsContext
-                attributes={{
-                  pluginId: plugin.getId(),
-                  ...(options.name && { extension: options.name }),
-                  ...(mountPoint && { routeRef: mountPoint.id }),
-                }}
-              >
-                <Component {...props} />
-              </AnalyticsContext>
-            </PluginErrorBoundary>
-          </Suspense>
+          <PluginProvider
+            plugin={plugin}
+            extensionName={options.name}
+            routeRef={mountPoint?.id}
+          >
+            <Suspense fallback={<Progress />}>
+              <PluginErrorBoundary app={app} plugin={plugin}>
+                <AnalyticsContext
+                  attributes={{
+                    pluginId: plugin.getId(),
+                    ...(options.name && { extension: options.name }),
+                    ...(mountPoint && { routeRef: mountPoint.id }),
+                  }}
+                >
+                  <Component {...props} />
+                </AnalyticsContext>
+              </PluginErrorBoundary>
+            </Suspense>
+          </PluginProvider>
         );
       };
 
