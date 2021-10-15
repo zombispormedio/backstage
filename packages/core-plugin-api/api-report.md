@@ -772,6 +772,18 @@ export type PluginHooks = {
   featureFlags: FeatureFlagsHooks;
 };
 
+// Warning: (ae-missing-release-tag) "PluginInfo" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PluginInfo {
+  // (undocumented)
+  extensionName?: string;
+  // (undocumented)
+  plugin: BackstagePlugin<any, any>;
+  // (undocumented)
+  routeRef?: string;
+}
+
 // Warning: (ae-missing-release-tag) "PluginOutput" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -949,6 +961,11 @@ export function useElementFilter<T>(
   filterFn: (arg: ElementCollection) => T,
   dependencies?: any[],
 ): T;
+
+// Warning: (ae-missing-release-tag) "usePlugin" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function usePlugin(): PluginInfo | undefined;
 
 // Warning: (ae-missing-release-tag) "UserFlags" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
