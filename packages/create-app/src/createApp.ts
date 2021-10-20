@@ -83,7 +83,7 @@ async function moveApp(tempDir: string, destination: string, id: string) {
   });
 }
 
-export default async (cmd: Command): Promise<void> => {
+export default async (cmd: Command, version: string): Promise<void> => {
   /* eslint-disable-next-line no-restricted-syntax */
   const paths = findPaths(__dirname);
 
@@ -130,7 +130,7 @@ export default async (cmd: Command): Promise<void> => {
     await createTemporaryAppFolder(tempDir);
 
     Task.section('Preparing files');
-    await templatingTask(templateDir, tempDir, answers);
+    await templatingTask(templateDir, tempDir, answers, version);
 
     Task.section('Moving to final location');
     await moveApp(tempDir, appDir, answers.name);
