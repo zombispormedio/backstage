@@ -40,6 +40,9 @@ export type ActionContext<Input extends InputBase> = {
   input: Input;
   output(name: string, value: JsonValue): void;
   createTemporaryDirectory(): Promise<string>;
+  metadata?: {
+    name: string;
+  };
 };
 
 // Warning: (ae-missing-release-tag) "CatalogEntityClient" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

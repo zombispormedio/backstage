@@ -43,6 +43,10 @@ export type DbTaskEventRow = {
   createdAt: string;
 };
 
+type TemplateMetadata = {
+  name: string;
+};
+
 export interface TaskSpecV1beta2 {
   apiVersion: 'backstage.io/v1beta2';
   baseUrl?: string;
@@ -55,6 +59,7 @@ export interface TaskSpecV1beta2 {
     if?: string | boolean;
   }>;
   output: { [name: string]: string };
+  metadata?: TemplateMetadata;
 }
 
 export interface TaskStep {
@@ -70,6 +75,7 @@ export interface TaskSpecV1beta3 {
   parameters: JsonObject;
   steps: TaskStep[];
   output: { [name: string]: JsonValue };
+  metadata?: TemplateMetadata;
 }
 
 export type TaskSpec = TaskSpecV1beta2 | TaskSpecV1beta3;
