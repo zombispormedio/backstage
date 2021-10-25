@@ -15,7 +15,6 @@
  */
 
 import { PluginEndpointDiscovery } from '@backstage/backend-common';
-import { Entity } from '@backstage/catalog-model';
 import { IndexableDocument } from '@backstage/search-common';
 import { Config } from '@backstage/config';
 import {
@@ -24,7 +23,7 @@ import {
   CatalogEntitiesRequest,
 } from '@backstage/catalog-client';
 
-interface CatalogEntityDocument extends IndexableDocument {
+export interface CatalogEntityDocument extends IndexableDocument {
   componentType: string;
   namespace: string;
   kind: string;
@@ -32,11 +31,7 @@ interface CatalogEntityDocument extends IndexableDocument {
   owner: string;
 }
 
-/**
- * @deprecated Upgrade to a more recent `@backstage/search-backend-node` and
- * use DefaultCatalogCollator instead.
- */
-export class DefaultCatalogCollator {
+export class DefaultCatalogDocumentGenerator {
   protected discovery: PluginEndpointDiscovery;
   protected locationTemplate: string;
   protected filter?: CatalogEntitiesRequest['filter'];
@@ -50,7 +45,7 @@ export class DefaultCatalogCollator {
       filter?: CatalogEntitiesRequest['filter'];
     },
   ) {
-    return new DefaultCatalogCollator({
+    return new DefaultCatalogDocumentGenerator({
       ...options,
     });
   }
@@ -85,12 +80,14 @@ export class DefaultCatalogCollator {
     return formatted.toLowerCase();
   }
 
-  async execute() {
-    const response = await this.catalogClient.getEntities({
-      filter: this.filter,
-    });
-    return response.items.map((entity: Entity): CatalogEntityDocument => {
-      return {
+  async *execute() {
+    const entities = (
+      await this.catalogClient.getEntities({
+        filter: this.filter,
+      })
+    ).items;
+    for (const entity of entities) {
+      yield {
         title: entity.metadata.title ?? entity.metadata.name,
         location: this.applyArgsToFormat(this.locationTemplate, {
           namespace: entity.metadata.namespace || 'default',
@@ -104,6 +101,6 @@ export class DefaultCatalogCollator {
         lifecycle: (entity.spec?.lifecycle as string) || '',
         owner: (entity.spec?.owner as string) || '',
       };
-    });
+    }
   }
 }
