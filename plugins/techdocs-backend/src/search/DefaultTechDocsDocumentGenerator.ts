@@ -30,7 +30,7 @@ interface MkSearchIndexDoc {
   location: string;
 }
 
-type TechDocsCollatorOptions = {
+export type TechDocsCollatorOptions = {
   discovery: PluginEndpointDiscovery;
   logger: Logger;
   locationTemplate?: string;
@@ -45,11 +45,7 @@ type EntityInfo = {
   kind: string;
 };
 
-/**
- * @deprecated Upgrade to a more recent `@backstage/search-backend-node` and
- * use DefaultTechDocsCollatorFactory instead.
- */
-export class DefaultTechDocsCollator {
+export class DefaultTechDocsDocumentGenerator {
   protected discovery: PluginEndpointDiscovery;
   protected locationTemplate: string;
   private readonly logger: Logger;
@@ -58,10 +54,7 @@ export class DefaultTechDocsCollator {
   private readonly legacyPathCasing: boolean;
   public readonly type: string = 'techdocs';
 
-  /**
-   * @deprecated use static fromConfig method instead.
-   */
-  constructor({
+  private constructor({
     discovery,
     locationTemplate,
     logger,
@@ -84,10 +77,13 @@ export class DefaultTechDocsCollator {
       config.getOptionalBoolean(
         'techdocs.legacyUseCaseSensitiveTripletPaths',
       ) || false;
-    return new DefaultTechDocsCollator({ ...options, legacyPathCasing });
+    return new DefaultTechDocsDocumentGenerator({
+      ...options,
+      legacyPathCasing,
+    });
   }
 
-  async execute() {
+  async *execute() {
     const limit = pLimit(this.parallelismLimit);
     const techDocsBaseUrl = await this.discovery.getBaseUrl('techdocs');
     const entities = await this.catalogClient.getEntities({
@@ -107,18 +103,19 @@ export class DefaultTechDocsCollator {
       .filter(it => it.metadata?.annotations?.['backstage.io/techdocs-ref'])
       .map((entity: Entity) =>
         limit(async (): Promise<TechDocsDocument[]> => {
-          const entityInfo = DefaultTechDocsCollator.handleEntityInfoCasing(
-            this.legacyPathCasing,
-            {
-              kind: entity.kind,
-              namespace: entity.metadata.namespace || 'default',
-              name: entity.metadata.name,
-            },
-          );
+          const entityInfo =
+            DefaultTechDocsDocumentGenerator.handleEntityInfoCasing(
+              this.legacyPathCasing,
+              {
+                kind: entity.kind,
+                namespace: entity.metadata.namespace || 'default',
+                name: entity.metadata.name,
+              },
+            );
 
           try {
             const searchIndexResponse = await fetch(
-              DefaultTechDocsCollator.constructDocsIndexUrl(
+              DefaultTechDocsDocumentGenerator.constructDocsIndexUrl(
                 techDocsBaseUrl,
                 entityInfo,
               ),
@@ -150,7 +147,7 @@ export class DefaultTechDocsCollator {
           }
         }),
       );
-    return (await Promise.all(docPromises)).flat();
+    yield* (await Promise.all(docPromises)).flat();
   }
 
   protected applyArgsToFormat(
