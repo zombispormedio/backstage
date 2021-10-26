@@ -11,15 +11,15 @@ import { PermissionCondition } from '@backstage/permission-common';
 import { PermissionCriteria } from '@backstage/permission-common';
 import { Router } from 'express';
 
-// Warning: (ae-missing-release-tag) "AllowAllPermissionHandler" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "AllowAllAuthorizationPolicy" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export class AllowAllPermissionHandler implements PermissionHandler {
+export class AllowAllAuthorizationPolicy implements AuthorizationPolicy {
   // (undocumented)
   handle(
     _request: OpaqueAuthorizeRequest,
     _user?: BackstageIdentity,
-  ): Promise<HandlerResult>;
+  ): Promise<PolicyResult>;
 }
 
 // Warning: (ae-missing-release-tag) "ApplyConditionsRequest" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -31,10 +31,21 @@ export type ApplyConditionsRequest = {
   conditions: PermissionCriteria<PermissionCondition<unknown[]>>;
 };
 
-// Warning: (ae-missing-release-tag) "ConditionalHandlerResult" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "AuthorizationPolicy" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type ConditionalHandlerResult = {
+export interface AuthorizationPolicy {
+  // (undocumented)
+  handle(
+    request: OpaqueAuthorizeRequest,
+    user?: BackstageIdentity,
+  ): Promise<PolicyResult>;
+}
+
+// Warning: (ae-missing-release-tag) "ConditionalPolicyResult" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ConditionalPolicyResult = {
   result: AuthorizeResult.MAYBE;
   conditions: {
     pluginId: string;
@@ -91,24 +102,6 @@ export const createPermissionIntegration: <
   ) => void;
 };
 
-// Warning: (ae-missing-release-tag) "HandlerResult" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type HandlerResult =
-  | DefinitiveAuthorizeResult
-  | ConditionalHandlerResult;
-
-// Warning: (ae-missing-release-tag) "PermissionHandler" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PermissionHandler {
-  // (undocumented)
-  handle(
-    request: OpaqueAuthorizeRequest,
-    user?: BackstageIdentity,
-  ): Promise<HandlerResult>;
-}
-
 // Warning: (ae-missing-release-tag) "PermissionRule" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -118,6 +111,11 @@ export type PermissionRule<TResource, TQuery, TParams extends any[] = any> = {
   apply(resource: TResource, ...params: TParams): boolean;
   toQuery(...params: TParams): TQuery | PermissionCriteria<TQuery>;
 };
+
+// Warning: (ae-missing-release-tag) "PolicyResult" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type PolicyResult = DefinitiveAuthorizeResult | ConditionalPolicyResult;
 
 // Warnings were encountered during analysis:
 //

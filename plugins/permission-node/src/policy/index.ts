@@ -15,8 +15,8 @@
  */
 
 export type {
-  ConditionalHandlerResult,
-  HandlerResult,
-  PermissionHandler,
+  AuthorizationPolicy,
+  ConditionalPolicyResult,
+  PolicyResult,
 } from './types';
-export { AllowAllPermissionHandler } from './AllowAllPermissionHandler';
+export { AllowAllAuthorizationPolicy } from './AllowAllAuthorizationPolicy';
