@@ -1,5 +1,17 @@
 # @backstage/backend-common
 
+## 0.9.8
+
+### Patch Changes
+
+- 10615525f3: Switch to use the json and observable types from `@backstage/types`
+- Updated dependencies
+  - @backstage/config@0.1.11
+  - @backstage/cli-common@0.1.5
+  - @backstage/errors@0.1.4
+  - @backstage/integration@0.6.9
+  - @backstage/config-loader@0.7.1
+
 ## 0.9.7
 
 ### Patch Changes
