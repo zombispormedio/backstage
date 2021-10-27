@@ -15,7 +15,6 @@
  */
 import React from 'react';
 import { Routes, Route } from 'react-router';
-import { azureDevOpsRouteRef } from '../routes';
 import { EntityPageAzurePipelines } from './EntityPageAzurePipelines';
 import { AZURE_DEVOPS_ANNOTATION } from '../constants';
 import { Entity } from '@backstage/catalog-model';
@@ -35,7 +34,7 @@ export const Router = ({ defaultLimit }: { defaultLimit?: number }) => {
   return (
     <Routes>
       <Route
-        path={`/${azureDevOpsRouteRef.path}`}
+        path="/"
         element={<EntityPageAzurePipelines defaultLimit={defaultLimit} />}
       />
     </Routes>
