@@ -6,6 +6,7 @@ import {
   PluginEndpointDiscovery,
   UrlReader,
 } from '@backstage/backend-common';
+import { PermissionClient } from '@backstage/permission-common';
 
 export type PluginEnvironment = {
   logger: Logger;
@@ -14,4 +15,5 @@ export type PluginEnvironment = {
   config: Config;
   reader: UrlReader;
   discovery: PluginEndpointDiscovery;
+  permissions: PermissionClient;
 };
